@@ -30,7 +30,6 @@ class SignupRequest extends FormRequest
             'password' => [
                 'required',
                 'confirmed',
-                Password::min(1)
             ]
         ];
     }

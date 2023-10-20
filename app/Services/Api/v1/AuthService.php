@@ -21,7 +21,6 @@ class AuthService
             'email' => $userInfo->email,
             'password' => Hash::make($userInfo->password),
         ]);
-        // $user->assignRole('admin');
         $response = $this->success([
             'user' => $user
         ], 'New admin user created successfully', 201);
@@ -30,9 +29,7 @@ class AuthService
 
     public function login($request)
     {
-        var_dump($request);
-        if (Auth::guard()->attempt($request->only('email', 'password'))) {
-        // if (Auth::guard()->attempt(['email' => $request->email, 'password' => $request->password, 'active' => 1])) {
+        if (Auth::guard()->attempt(['email' => $request->email, 'password' => $request->password, 'active' => 1])) {
             $request->session()->regenerate();
             return $this->success([], 'User is authenticated', 200);
         }
