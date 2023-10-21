@@ -4,25 +4,18 @@ import axiosClient from "../axios-client.js";
 import { useEffect } from "react";
 
 export default function DefaultLayout() {
-    const { user, setUser, notification } = useStateContext();
+    const { authorized, setAuthorized, notification } = useStateContext();
 
-    if (!token) {
+    if (!authorized) {
         return <Navigate to="/login" />;
     }
 
-    const onLogout = (ev) => {
+    const onLogout = async (ev) => {
         ev.preventDefault();
 
-        axiosClient.post("/logout").then(() => {
-            setUser({});
-        });
+        await axiosClient.post("/logout");
+        setAuthorized(false);
     };
-
-    useEffect(() => {
-        axiosClient.get("/user").then(({ data }) => {
-            setUser(data);
-        });
-    }, []);
 
     return (
         <div id="defaultLayout">
@@ -31,7 +24,7 @@ export default function DefaultLayout() {
                     <div>Header</div>
 
                     <div>
-                        {user.name} &nbsp; &nbsp;
+                        {/* {user.name} &nbsp; &nbsp; */}
                         <a onClick={onLogout} className="btn-logout" href="#">
                             Logout
                         </a>

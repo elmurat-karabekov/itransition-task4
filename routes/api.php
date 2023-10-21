@@ -14,10 +14,6 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-// Route::group(['middleware' => ['auth:sanctum', 'check.role']], function () {
-//     Route::apiResource('/users', UserController::class);
-// });
-
 Route::apiResource('/users', UserController::class)->middleware('auth:sanctum');
 
 

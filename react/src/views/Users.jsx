@@ -6,7 +6,7 @@ import { useStateContext } from "../context/ContextProvider.jsx";
 export default function Users() {
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(false);
-    const { setNotification } = useStateContext();
+    const { setNotification, setAuthorized } = useStateContext();
 
     useEffect(() => {
         getUsers();
@@ -16,7 +16,7 @@ export default function Users() {
         if (!window.confirm("Are you sure you want to delete this user?")) {
             return;
         }
-        axiosClient.delete(`/users/${user.id}`).then(() => {
+        axiosClient.delete(`api/v1/users/${user.id}`).then(() => {
             setNotification("User was successfully deleted");
             getUsers();
         });
@@ -25,12 +25,13 @@ export default function Users() {
     const getUsers = () => {
         setLoading(true);
         axiosClient
-            .get("/users")
+            .get("/api/v1/users")
             .then(({ data }) => {
                 setLoading(false);
                 setUsers(data.data);
             })
             .catch(() => {
+                setAuthorized(false);
                 setLoading(false);
             });
     };
@@ -63,7 +64,7 @@ export default function Users() {
                     {loading && (
                         <tbody>
                             <tr>
-                                <td colSpan="5" class="text-center">
+                                <td colSpan="5" className="text-center">
                                     Loading...
                                 </td>
                             </tr>

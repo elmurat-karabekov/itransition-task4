@@ -21,8 +21,8 @@ class AuthController extends Controller
 
     public function signup(SignupRequest $request)
     {
-        $userInfo = $request->validated();
-        $response = $this->authService->signup($userInfo);
+        $request->validated();
+        $response = $this->authService->signup($request);
         return $response;
     }
 

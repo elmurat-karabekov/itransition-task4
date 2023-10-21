@@ -21,6 +21,7 @@ class AuthService
             'email' => $userInfo->email,
             'password' => Hash::make($userInfo->password),
         ]);
+        $this->login($userInfo);
         $response = $this->success([
             'user' => $user
         ], 'New admin user created successfully', 201);

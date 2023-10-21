@@ -10,6 +10,7 @@ function App() {
 
     const onClick = async (e) => {
         e.preventDefault();
+        await axiosClient.get("/sanctum/csrf-cookie");
         await axiosClient.get("api/v1/users");
     };
 
@@ -38,7 +39,7 @@ function App() {
                         type="password"
                         placeholder="Password"
                     />
-                    <button className="btn btn-block">Signup</button>
+                    <button className="btn btn-block">Login</button>
                     <p className="message">
                         {/* Already registered? <Link to="/login">Sign In</Link> */}
                     </p>
