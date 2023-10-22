@@ -1,30 +1,33 @@
 import { Navigate, Outlet } from "react-router-dom";
 import { useStateContext } from "../context/ContextProvider";
 import axiosClient from "../axios-client.js";
-import { useEffect } from "react";
 
 export default function DefaultLayout() {
-    const { authorized, setAuthorized, notification } = useStateContext();
+    const { auth, setAuth, notification, user, setUser } = useStateContext();
 
-    if (!authorized) {
+    if (!auth) {
         return <Navigate to="/login" />;
     }
 
     const onLogout = async (ev) => {
         ev.preventDefault();
-
         await axiosClient.post("/logout");
-        setAuthorized(false);
+        setUser("");
+        setAuth(false);
     };
 
     return (
         <div id="defaultLayout">
             <div className="content">
                 <header>
-                    <div>Header</div>
-
-                    <div>
-                        {/* {user.name} &nbsp; &nbsp; */}
+                    <div
+                        style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "10px",
+                        }}
+                    >
+                        Hello, <strong>{user.name}</strong>
                         <a onClick={onLogout} className="btn-logout" href="#">
                             Logout
                         </a>

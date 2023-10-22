@@ -7,7 +7,7 @@ import { useState } from "react";
 export default function Login() {
     const emailRef = createRef();
     const passwordRef = createRef();
-    const { setAuthorized } = useStateContext();
+    const { setUser } = useStateContext();
     const [message, setMessage] = useState(null);
 
     const onSubmit = async (ev) => {
@@ -16,8 +16,21 @@ export default function Login() {
             email: emailRef.current.value,
             password: passwordRef.current.value,
         };
-        await axiosClient.post("/login", payload);
-        setAuthorized(true);
+        try {
+            const response = await axiosClient.post("/login", payload);
+            setUser(response.data.data.user);
+        } catch (error) {
+            const response = error.response;
+            response.status === 403
+                ? setMessage(
+                      "Sorry, you have been denied access to this resource. Contact your support team for further assistance and clarification."
+                  )
+                : response.status === 422
+                ? setMessage(response.data.message)
+                : setMessage(
+                      "Invalid credentials. Please double-check your email and password, and try again."
+                  );
+        }
     };
 
     return (
@@ -25,13 +38,11 @@ export default function Login() {
             <div className="form">
                 <form onSubmit={onSubmit}>
                     <h1 className="title">Login into your account</h1>
-
                     {message && (
                         <div className="alert">
                             <p>{message}</p>
                         </div>
                     )}
-
                     <input ref={emailRef} type="email" placeholder="Email" />
                     <input
                         ref={passwordRef}

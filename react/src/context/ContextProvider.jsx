@@ -4,7 +4,8 @@ import axiosClient from "../axios-client";
 const StateContext = createContext({});
 
 export const ContextProvider = ({ children }) => {
-    const [authorized, setAuthorized] = useState("");
+    const [user, setUser] = useState("");
+    const [auth, setAuth] = useState(false);
     const [notification, _setNotification] = useState("");
 
     const setNotification = (message) => {
@@ -16,30 +17,24 @@ export const ContextProvider = ({ children }) => {
     };
 
     useEffect(() => {
-        const fetchData = async () => {
-            try {
-                await axiosClient.get("/sanctum/csrf-cookie");
-                const response = await axiosClient.get("api/v1/users");
-                // Check if the response status code is 401
-                if (response.status === 401) {
-                    console.log(response.data.message);
-                } else if (response.status === 200) {
-                    // If the response status is 200, set authorized to true
-                    setAuthorized(true);
-                }
-            } catch (error) {
-                console.error("Error:", error);
-            }
-        };
-
-        fetchData();
+        fetchUsers();
     }, []);
+
+    const fetchUsers = async () => {
+        try {
+            const response = await axiosClient.get("/api/v1/user");
+            setUser(response.data);
+            setAuth(true);
+        } catch (error) {}
+    };
 
     return (
         <StateContext.Provider
             value={{
-                authorized,
-                setAuthorized,
+                user,
+                setUser,
+                auth,
+                setAuth,
                 notification,
                 setNotification,
             }}

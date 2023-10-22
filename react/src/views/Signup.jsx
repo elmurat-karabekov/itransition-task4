@@ -8,7 +8,7 @@ export default function Signup() {
     const emailRef = createRef();
     const passwordRef = createRef();
     const passwordConfirmationRef = createRef();
-    const { setAuthorized } = useStateContext();
+    const { setUser } = useStateContext();
     const [errors, setErrors] = useState(null);
 
     const onSubmit = async (ev) => {
@@ -19,15 +19,28 @@ export default function Signup() {
             password: passwordRef.current.value,
             password_confirmation: passwordConfirmationRef.current.value,
         };
-        await axiosClient.post("/signup", payload);
-        setAuthorized(true);
+        try {
+            const response = await axiosClient.post("/signup", payload);
+            setUser(response.data.data.user);
+        } catch (error) {
+            error.response.status === 422
+                ? setErrors(error.response.data.errors)
+                : setErrors(["Something went wrong :( \nTry again later"]);
+        }
     };
 
     return (
         <div className="login-signup-form animated fadeInDown">
             <div className="form">
                 <form onSubmit={onSubmit}>
-                    <h1 className="title">Signup sdfdsf Free</h1>
+                    <h1 className="title">Signup for Free</h1>
+                    {errors && (
+                        <div className="alert">
+                            {Object.keys(errors).map((key) => (
+                                <p key={key}>{errors[key][0]}</p>
+                            ))}
+                        </div>
+                    )}
                     <input ref={nameRef} type="text" placeholder="Full Name" />
                     <input
                         ref={emailRef}
@@ -45,7 +58,9 @@ export default function Signup() {
                         placeholder="Repeat Password"
                     />
                     <button className="btn btn-block">Signup</button>
-                    <p className="message"></p>
+                    <p className="message">
+                        Already registered? <Link to="/login">Login</Link>
+                    </p>
                 </form>
             </div>
         </div>

@@ -14,7 +14,11 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::apiResource('/users', UserController::class)->middleware('auth:sanctum');
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/user', [UserController::class, 'showCurrentAuthUser']);
+    Route::apiResource('/users', UserController::class);
+});
+// Route::apiResource('/users', UserController::class)->middleware('auth:sanctum');
 
 
 

@@ -1,12 +1,12 @@
-import { useEffect, useState } from "react";
+import { createRef, useEffect, useState } from "react";
 import axiosClient from "../axios-client.js";
-import { Link } from "react-router-dom";
 import { useStateContext } from "../context/ContextProvider.jsx";
 
 export default function Users() {
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(false);
-    const { setNotification, setAuthorized } = useStateContext();
+    const { setNotification } = useStateContext();
+    const selectAllRef = createRef();
 
     useEffect(() => {
         getUsers();
@@ -22,18 +22,15 @@ export default function Users() {
         });
     };
 
-    const getUsers = () => {
-        setLoading(true);
-        axiosClient
-            .get("/api/v1/users")
-            .then(({ data }) => {
-                setLoading(false);
-                setUsers(data.data);
-            })
-            .catch(() => {
-                setAuthorized(false);
-                setLoading(false);
-            });
+    const getUsers = async () => {
+        try {
+            setLoading(true);
+            const response = await axiosClient.get("/api/v1/users");
+            setLoading(false);
+            setUsers(response.data.data);
+        } catch (error) {
+            setLoading(false);
+        }
     };
 
     return (
@@ -41,24 +38,41 @@ export default function Users() {
             <div
                 style={{
                     display: "flex",
-                    justifyContent: "space-between",
+                    justifyContent: "flex-start",
+                    gap: "10px",
                     alignItems: "center",
                 }}
             >
-                <h1>Users</h1>
-                <Link className="btn-add" to="/users/new">
-                    Add new
-                </Link>
+                <button className="btn-add" onClick={(ev) => onBlockClick(u)}>
+                    Unblock
+                </button>
+                <button className="btn-edit" onClick={(ev) => onBlockClick(u)}>
+                    Block
+                </button>
+                &nbsp;
+                <button
+                    className="btn-delete"
+                    onClick={(ev) => onDeleteClick(u)}
+                >
+                    Delete
+                </button>
             </div>
             <div className="card animated fadeInDown">
                 <table>
                     <thead>
                         <tr>
-                            <th>ID</th>
+                            <th>
+                                <input
+                                    type="checkbox"
+                                    className="checkbox"
+                                    ref={selectAllRef}
+                                />
+                            </th>
                             <th>Name</th>
                             <th>Email</th>
-                            <th>Create Date</th>
-                            <th>Actions</th>
+                            <th>Last login</th>
+                            <th>Registration Date</th>
+                            <th>Status</th>
                         </tr>
                     </thead>
                     {loading && (
@@ -74,25 +88,18 @@ export default function Users() {
                         <tbody>
                             {users.map((u) => (
                                 <tr key={u.id}>
-                                    <td>{u.id}</td>
+                                    <td>
+                                        <input
+                                            type="checkbox"
+                                            name="select"
+                                            className="checkbox"
+                                        />
+                                    </td>
                                     <td>{u.name}</td>
                                     <td>{u.email}</td>
+                                    <td></td>
                                     <td>{u.created_at}</td>
-                                    <td>
-                                        <Link
-                                            className="btn-edit"
-                                            to={"/users/" + u.id}
-                                        >
-                                            Edit
-                                        </Link>
-                                        &nbsp;
-                                        <button
-                                            className="btn-delete"
-                                            onClick={(ev) => onDeleteClick(u)}
-                                        >
-                                            Delete
-                                        </button>
-                                    </td>
+                                    <td>{u.active ? "active" : "blocked"}</td>
                                 </tr>
                             ))}
                         </tbody>

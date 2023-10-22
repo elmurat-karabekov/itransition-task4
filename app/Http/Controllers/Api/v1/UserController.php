@@ -7,6 +7,7 @@ use App\Http\Requests\StoreUserRequest;
 use App\Http\Requests\UpdateUserRequest;
 use App\Http\Resources\UserResource;
 use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
@@ -45,6 +46,11 @@ class UserController extends Controller
     public function show(User $user)
     {
         return new UserResource($user);
+    }
+
+    public function showCurrentAuthUser() {
+        $currentUser = Auth::user();
+        return new UserResource($currentUser);
     }
 
     /**
